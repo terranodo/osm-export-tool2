@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import importlib
 import logging
-import os
+import sys
 import re
 import json
 
@@ -22,12 +22,12 @@ logger = logging.getLogger(__name__)
 
 export_task_registry = {
         'sqlite': 'oet2.tasks.export_tasks.SqliteExportTask',
-        'thematic_sqlite': 'oet2.tasks.export_tasks.ThematicSqliteExportTask',
+        'thematic-sqlite': 'oet2.tasks.export_tasks.ThematicSqliteExportTask',
         'kml': 'oet2.tasks.export_tasks.KmlExportTask',
         'shp': 'oet2.tasks.export_tasks.ShpExportTask',
-        'thematic_shp': 'oet2.tasks.export_tasks.ThematicShpExportTask',
+        'thematic-shp': 'oet2.tasks.export_tasks.ThematicShpExportTask',
         'gpkg': 'oet2.tasks.export_tasks.GeopackageExportTask',
-        'thematic_gpkg': 'oet2.tasks.export_tasks.ThematicGeopackageExportTask'
+        'thematic-gpkg': 'oet2.tasks.export_tasks.ThematicGeopackageExportTask'
     }
 
 thematic_tasks_list = ['thematic_sqlite', 'thematic_shp', 'thematic_geopackage']
@@ -152,11 +152,11 @@ class ExportOSMTaskRunner(TaskRunner):
             thematic_tasks = None
             if thematic_exports:
                 thematic_sqlite = thematic_exports.pop('thematic_sqlite',
-                                                       {'obj': create_format_task('thematic_sqlite'), 'task_uid': None})
-                thematic_tasks = chain(thematic_sqlite.si(run_uid=run.uid,
-                                                          stage_dir=stage_dir,
-                                                          job_name=job_name,
-                                                          task_uid=task.get('task_uid')) | group(
+                                                       {'obj': create_format_task('thematic_sqlite')(), 'task_uid': None})
+                thematic_tasks = chain(thematic_sqlite.get('obj').si(run_uid=run.uid,
+                                                                      stage_dir=stage_dir,
+                                                                      job_name=job_name,
+                                                                      task_uid=task.get('task_uid')),  group(
                     task.get('obj').si(run_uid=run.uid,
                                        stage_dir=stage_dir,
                                        job_name=job_name,
@@ -178,10 +178,12 @@ class ExportOSMTaskRunner(TaskRunner):
             overall run status.
             """
             if thematic_tasks:
-                logger.error("RETURN ALL TASKS INCLUDING THEMATIC TASKS")
-                return chain(chain(initial_tasks | schema_tasks) | format_tasks | thematic_tasks)
+                print("RETURN ALL TASKS INCLUDING THEMATIC TASKS")
+                sys.stdout.flush()
+                return chain(chain(initial_tasks | schema_tasks) | thematic_tasks | format_tasks)
             else:
-                logger.error("RETURN ALL TASKS WITHOUT THEMATIC TASKS")
+                print("RETURN ALL TASKS WITHOUT THEMATIC TASKS")
+                sys.stdout.flush()
                 return chain(chain(initial_tasks | schema_tasks) | format_tasks)
         else:
             return False

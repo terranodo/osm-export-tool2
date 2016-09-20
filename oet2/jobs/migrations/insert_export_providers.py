@@ -20,8 +20,7 @@ class Migration(migrations.Migration):
                                                                'THEMATIC',
                                                                'GPKG'])
         osm_type = ExportProviderType.objects.create(type_name='osm')
-        for export_format in export_formats:
-            osm_type.supported_formats.add(export_format.pk)
+        osm_type.supported_formats.add(*export_formats)
         osm_type.save()
 
         export_formats = ExportFormat.objects.filter(slug__in=['GPKG'])
