@@ -18,15 +18,6 @@ INSTALLED_APPS += ("osgeo_importer", "djmp", "guardian", "djcelery",)
 
 LOGIN_URL = '/login/'
 
-EXPORT_TASKS = {
-    'shp': 'oet2.tasks.export_tasks.ShpExportTask',
-    'obf': 'oet2.tasks.export_tasks.ObfExportTask',
-    'sqlite': 'oet2.tasks.export_tasks.SqliteExportTask',
-    'kml': 'oet2.tasks.export_tasks.KmlExportTask',
-    'thematic': 'oet2.tasks.export_tasks.ThematicLayersExportTask',
-    'geopackage': 'oet2.tasks.export_tasks.GeopackageExportTask'
-}
-
 # where exports are staged for processing
 EXPORT_STAGING_ROOT = '/home/ubuntu/export_staging/'
 
